@@ -50,21 +50,6 @@ const DashboardView = ({ insights }) => {
     }
   };
 
-  const getMarketOutlookInfo = (outlook) => {
-    switch (outlook.toLowerCase()) {
-      case "positive":
-        return { icon: TrendingUp, color: "text-green-500" };
-      case "neutral":
-        return { icon: LineChart, color: "text-yellow-500" };
-      case "negative":
-        return { icon: TrendingDown, color: "text-red-500" };
-      default:
-        return { icon: LineChart, color: "text-gray-500" };
-    }
-  };
-
-  const OutlookIcon = getMarketOutlookInfo(insights.marketOutlook).icon;
-  const outlookColor = getMarketOutlookInfo(insights.marketOutlook).color;
 
   // Format dates using date-fns
   const lastUpdatedDate = format(new Date(insights.lastUpdated), "dd/MM/yyyy");
@@ -86,7 +71,7 @@ const DashboardView = ({ insights }) => {
             <CardTitle className="text-sm font-medium">
             Future In Research
             </CardTitle>
-            <OutlookIcon className={`h-4 w-4 ${outlookColor}`} />
+            
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{insights.FutureInResearch}</div>
