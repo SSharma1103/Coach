@@ -28,9 +28,8 @@ export async function generateQuiz() {
     user.skills?.length ? ` with expertise in ${user.skills.join(", ")}` : ""
   }.
     
-    Each question should be multiple choice with 4 options.
-    
-    Return the response in this JSON format only, no additional text:
+    Generate multiple-choice questions with 4 options, ensuring that each question has one correct answer and a detailed explanation,in that explanation also add source to learn (in text form only ). The questions should be relevant and clear, and the correct answer should be included in the options. Return the response in the following JSON format only, with no additional text:
+
     {
       "questions": [
         {

@@ -50,21 +50,6 @@ const DashboardView = ({ insights }) => {
     }
   };
 
-  const getMarketOutlookInfo = (outlook) => {
-    switch (outlook.toLowerCase()) {
-      case "positive":
-        return { icon: TrendingUp, color: "text-green-500" };
-      case "neutral":
-        return { icon: LineChart, color: "text-yellow-500" };
-      case "negative":
-        return { icon: TrendingDown, color: "text-red-500" };
-      default:
-        return { icon: LineChart, color: "text-gray-500" };
-    }
-  };
-
-  const OutlookIcon = getMarketOutlookInfo(insights.marketOutlook).icon;
-  const outlookColor = getMarketOutlookInfo(insights.marketOutlook).color;
 
   // Format dates using date-fns
   const lastUpdatedDate = format(new Date(insights.lastUpdated), "dd/MM/yyyy");
@@ -84,12 +69,12 @@ const DashboardView = ({ insights }) => {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              Market Outlook
+            Future In Research
             </CardTitle>
-            <OutlookIcon className={`h-4 w-4 ${outlookColor}`} />
+            
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{insights.marketOutlook}</div>
+            <div className="text-2xl font-bold">{insights.FutureInResearch}</div>
             <p className="text-xs text-muted-foreground">
               Next update {nextUpdateDistance}
             </p>
@@ -99,15 +84,14 @@ const DashboardView = ({ insights }) => {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              Industry Growth
+              Internships
             </CardTitle>
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {insights.growthRate.toFixed(1)}%
+              {insights.Internships}
             </div>
-            <Progress value={insights.growthRate} className="mt-2" />
           </CardContent>
         </Card>
 
@@ -152,35 +136,36 @@ const DashboardView = ({ insights }) => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="h-[400px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={salaryData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip
-                  content={({ active, payload, label }) => {
-                    if (active && payload && payload.length) {
-                      return (
-                        <div className="bg-background border rounded-lg p-2 shadow-md">
-                          <p className="font-medium">{label}</p>
-                          {payload.map((item) => (
-                            <p key={item.name} className="text-sm">
-                              {item.name}: ${item.value}K
-                            </p>
-                          ))}
-                        </div>
-                      );
-                    }
-                    return null;
-                  }}
-                />
-                <Bar dataKey="min" fill="#94a3b8" name="Min Salary (K)" />
-                <Bar dataKey="median" fill="#64748b" name="Median Salary (K)" />
-                <Bar dataKey="max" fill="#475569" name="Max Salary (K)" />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
+        <div className="h-[400px]">
+  <ResponsiveContainer width="100%" height="100%">
+    <BarChart data={salaryData}>
+      <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" /> {/* light gray lines */}
+      <XAxis dataKey="name" stroke="#fff" /> {/* white text */}
+      <YAxis stroke="#fff" /> {/* white text */}
+      <Tooltip
+        content={({ active, payload, label }) => {
+          if (active && payload && payload.length) {
+            return (
+              <div className="bg-black text-white border border-white rounded-lg p-2 shadow-md">
+                <p className="font-semibold">{label}</p>
+                {payload.map((item) => (
+                  <p key={item.name} className="text-sm">
+                    {item.name}: ${item.value}K
+                  </p>
+                ))}
+              </div>
+            );
+          }
+          return null;
+        }}
+      />
+      <Bar dataKey="min" fill="#ef4444" name="Min Salary (K)" />     {/* red */}
+      <Bar dataKey="median" fill="#ffffff" name="Median Salary (K)" /> {/* white */}
+      <Bar dataKey="max" fill="#22c55e" name="Max Salary (K)" />   
+    </BarChart>
+  </ResponsiveContainer>
+</div>
+
         </CardContent>
       </Card>
 

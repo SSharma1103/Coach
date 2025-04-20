@@ -14,16 +14,18 @@ export const generateAIInsights = async (industry) => {
             "salaryRanges": [
               { "role": "string", "min": number, "max": number, "median": number, "location": "string" }
             ],
-            "growthRate": number,
+            "internships": number,
             "demandLevel": "High" | "Medium" | "Low",
             "topSkills": ["skill1", "skill2"],
-            "marketOutlook": "Positive" | "Neutral" | "Negative",
+            "FutureInResearch": "Positive" | "Neutral" | "Negative",
             "keyTrends": ["trend1", "trend2"],
             "recommendedSkills": ["skill1", "skill2"]
           }
           
           IMPORTANT: Return ONLY the JSON. No additional text, notes, or markdown formatting.
           Include at least 5 common roles for salary ranges.
+          salary ranges should be for india.
+          salary ranges should be in inr dia.
           Growth rate should be a percentage.
           Include at least 5 skills and trends.
         `;
