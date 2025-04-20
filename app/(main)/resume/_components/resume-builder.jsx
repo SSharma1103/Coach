@@ -10,6 +10,7 @@ import {
   Loader2,
   Monitor,
   Save,
+  TrendingUp,
 } from "lucide-react";
 import { toast } from "sonner";
 import MDEditor from "@uiw/react-md-editor";
@@ -18,6 +19,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { saveResume } from "@/actions/resume";
+import {  getATSScore } from "@/actions/ats";
 import { EntryForm } from "./entry-form";
 import useFetch from "@/hooks/use-fetch";
 import { useUser } from "@clerk/nextjs";
@@ -30,6 +32,8 @@ export default function ResumeBuilder({ initialContent }) {
   const [previewContent, setPreviewContent] = useState(initialContent);
   const { user } = useUser();
   const [resumeMode, setResumeMode] = useState("preview");
+  const [atsScore, setAtsScore] = useState(null);
+  const [isGettingScore, setIsGettingScore] = useState(false);
 
   const {
     control,
@@ -56,6 +60,13 @@ export default function ResumeBuilder({ initialContent }) {
     error: saveError,
   } = useFetch(saveResume);
 
+  const {
+    loading: isScoring,
+    fn: getAtsScoreFn,
+    data: scoreResult,
+    error: scoreError,
+  } = useFetch(getATSScore);
+
   // Watch form fields for preview updates
   const formValues = watch();
 
@@ -81,13 +92,23 @@ export default function ResumeBuilder({ initialContent }) {
     }
   }, [saveResult, saveError, isSaving]);
 
+  // Handle ATS score result
+  useEffect(() => {
+    if (scoreResult && !isScoring) {
+      setAtsScore(scoreResult);
+      toast.success(`Your ATS score is ${scoreResult}/100`);
+    }
+    if (scoreError) {
+      toast.error(scoreError.message || "Failed to get ATS score");
+    }
+  }, [scoreResult, scoreError, isScoring]);
+
   const getContactMarkdown = () => {
     const { contactInfo } = formValues;
     const parts = [];
     if (contactInfo.email) parts.push(`📧 ${contactInfo.email}`);
     if (contactInfo.mobile) parts.push(`📱 ${contactInfo.mobile}`);
-    if (contactInfo.linkedin)
-      parts.push(`💼 [LinkedIn](${contactInfo.linkedin})`);
+    if (contactInfo.linkedin) parts.push(`💼 [LinkedIn](${contactInfo.linkedin})`);
     if (contactInfo.twitter) parts.push(`🐦 [Twitter](${contactInfo.twitter})`);
 
     return parts.length > 0
@@ -135,21 +156,28 @@ export default function ResumeBuilder({ initialContent }) {
   const onSubmit = async (data) => {
     try {
       const formattedContent = previewContent
-        .replace(/\n/g, "\n") // Normalize newlines
-        .replace(/\n\s*\n/g, "\n\n") // Normalize multiple newlines to double newlines
+        .replace(/\n/g, "\n")
+        .replace(/\n\s*\n/g, "\n\n")
         .trim();
 
-      console.log(previewContent, formattedContent);
-      await saveResumeFn(previewContent);
+      await saveResumeFn({ content: previewContent, userId: user?.id });
     } catch (error) {
       console.error("Save error:", error);
+    }
+  };
+
+  const handleGetAtsScore = async () => {
+    try {
+      await getAtsScoreFn(previewContent);
+    } catch (error) {
+      console.error("Error getting ATS score:", error);
     }
   };
 
   return (
     <div data-color-mode="light" className="space-y-4">
       <div className="flex flex-col md:flex-row justify-between items-center gap-2">
-        <h1 className="font-bold gradient-title text-5xl md:text-6xl">
+        <h1 className="font-bold text-white text-5xl md:text-6xl">
           Resume Builder
         </h1>
         <div className="space-x-2">
@@ -170,6 +198,23 @@ export default function ResumeBuilder({ initialContent }) {
               </>
             )}
           </Button>
+          <Button
+            variant="outline"
+            onClick={handleGetAtsScore}
+            disabled={isScoring}
+          >
+            {isScoring ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Getting score...
+              </>
+            ) : (
+              <>
+                <TrendingUp className="h-4 w-4" />
+                {atsScore ? `ATS: ${atsScore}/100` : "ATS Score"}
+              </>
+            )}
+          </Button>
           <Button onClick={generatePDF} disabled={isGenerating}>
             {isGenerating ? (
               <>
@@ -185,7 +230,6 @@ export default function ResumeBuilder({ initialContent }) {
           </Button>
         </div>
       </div>
-
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList>
           <TabsTrigger value="edit">Form</TabsTrigger>
@@ -414,6 +458,9 @@ export default function ResumeBuilder({ initialContent }) {
           </div>
         </TabsContent>
       </Tabs>
+
+      {/* Rest of your component remains the same */}
+      {/* ... */}
     </div>
   );
 }

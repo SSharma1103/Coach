@@ -82,6 +82,7 @@ export async function improveWithAI({ current, type }) {
     4. Keep it concise but detailed
     5. Focus on achievements over responsibilities
     6. Use industry-specific keywords
+    7. Provide the ats score of resume
     
     Format the response as a single paragraph without any additional text or explanations.
   `;
